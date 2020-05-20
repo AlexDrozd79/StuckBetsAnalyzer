@@ -35,7 +35,7 @@ namespace StuckBetsAnalyzer
 			{
 				string[] btmids = GetGameBTMIDs(game, externalProviderCode);
 
-				if (btmids.Length == 0)
+				if (btmids.Length == 0 && !bool.Parse(ConfigurationManager.AppSettings["IgnoreWithoutBTMID"]))
 				{
 					btmids = GetGameBTMIDs(game, null);
 				}

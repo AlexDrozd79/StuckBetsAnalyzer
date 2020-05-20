@@ -32,6 +32,8 @@ namespace StuckBetsAnalyzer
 			comboGameProviders.DataSource = StuckedGames.StuckedGames.GetGameProviders();
 			comboGameProviders.DisplayMember = "ExternalProviderName";
 			comboGameProviders.ValueMember = "ExternalProviderCode";
+
+			comboGameProviders.SelectedValue = "S";
 			currentExternalGameProvider = comboGameProviders.SelectedValue.ToString();
 
 			subProviders = StuckedGames.StuckedGames.GetGameSubProviders();
@@ -98,7 +100,7 @@ namespace StuckBetsAnalyzer
 
 		private void StuckGamesLogAnalyzer_onGameProcessing(StuckGame game)
 		{
-			Invoke((MethodInvoker)delegate { stripStatus.Text = "Processed " + game.GameProviderSerialNumber; });
+			Invoke((MethodInvoker)delegate { stripStatus.Text = "Processed " + game.GameProviderSerialNumber + ". " + games.IndexOf(game) + " from " + games.Count; });
 		}
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
