@@ -16,6 +16,9 @@ namespace StuckBetsAnalyzer.StuckedGames
 
 		public string Message { get; set; }
 
+		public string GameProviderSerialNumber { get; set; }
+
+		public string ExternalSubProviderCode { get; set; }
 
 	}
 }

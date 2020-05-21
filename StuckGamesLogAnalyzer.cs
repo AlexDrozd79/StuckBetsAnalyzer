@@ -42,7 +42,7 @@ namespace StuckBetsAnalyzer
 
 				if (btmids.Length > 0)
 				{
-					logEntries.AddRange(GetGameLogEntries(btmids, game.LastModifiedDate));
+					logEntries.AddRange(GetGameLogEntries(btmids, game));
 				}
 				else
 				{
@@ -59,34 +59,42 @@ namespace StuckBetsAnalyzer
 		private static string[] GetGameBTMIDs(StuckGame game, string externalProviderCode)
 		{
 			List<string> btmids = new List<string>();
-			using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["Logger"].ConnectionString))
+			try
 			{
-				string sql = "select BTMID  from LogEntries with (nolock)  where Message like '%" + game.GameProviderSerialNumber + "%' and CreateDate > '" + game.LastModifiedDate.AddMinutes(-2).ToString("yyyy-MM-dd HH:mm:ss") + "' and CreateDate < '" + game.LastModifiedDate.AddMinutes(2).ToString("yyyy-MM-dd HH:mm:ss") + "'";
-				if (externalProviderCode != null && ConfigurationManager.AppSettings[externalProviderCode] != null)
+				using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["Logger"].ConnectionString))
 				{
-					sql = "select BTMID  from LogEntries with (nolock)  where Message like '%" + game.GameProviderSerialNumber + "%' and CreateDate > '" + game.LastModifiedDate.AddMinutes(-2).ToString("yyyy-MM-dd HH:mm:ss") + "' and CreateDate < '" + game.LastModifiedDate.AddMinutes(2).ToString("yyyy-MM-dd HH:mm:ss") + "' and Application = '" + ConfigurationManager.AppSettings[externalProviderCode] + "'";
-				}
+					string sql = "select BTMID  from LogEntries with (nolock)  where Message like '%" + game.GameProviderSerialNumber + "%' and CreateDate > '" + game.LastModifiedDate.AddMinutes(-2).ToString("yyyy-MM-dd HH:mm:ss") + "' and CreateDate < '" + game.LastModifiedDate.AddMinutes(2).ToString("yyyy-MM-dd HH:mm:ss") + "'";
+					if (externalProviderCode != null && ConfigurationManager.AppSettings[externalProviderCode] != null)
+					{
+						sql = "select BTMID  from LogEntries with (nolock)  where Message like '%" + game.GameProviderSerialNumber + "%' and CreateDate > '" + game.LastModifiedDate.AddMinutes(-2).ToString("yyyy-MM-dd HH:mm:ss") + "' and CreateDate < '" + game.LastModifiedDate.AddMinutes(2).ToString("yyyy-MM-dd HH:mm:ss") + "' and Application = '" + ConfigurationManager.AppSettings[externalProviderCode] + "'";
+					}
 
-				conn.Open();
-				SqlCommand cmd = new SqlCommand(sql, conn);
-				SqlDataReader reader = cmd.ExecuteReader();
+					conn.Open();
+					SqlCommand cmd = new SqlCommand(sql, conn);
+					cmd.CommandTimeout = 0;
+					SqlDataReader reader = cmd.ExecuteReader();
 
-				while (reader.Read())
-				{
-					btmids.Add( reader["BTMID"].ToString());
+					while (reader.Read())
+					{
+						btmids.Add(reader["BTMID"].ToString());
+					}
+					reader.Close();
 				}
-				reader.Close();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.ToString());
 			}
 			return btmids.ToArray();
 		}
 
-		private static List<LogEntry> GetGameLogEntries(string[] BTMIDs, DateTime lastModifiedDate)
+		private static List<LogEntry> GetGameLogEntries(string[] BTMIDs, StuckGame game)
 		{
 			List<LogEntry> logEntries = new List<LogEntry>();
 			using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["Logger"].ConnectionString))
 			{
 				conn.Open();
-				SqlCommand cmd = new SqlCommand("select CreateDate, BTMID, Code, Message   from  LogEntries with (nolock)  where CreateDate > '" + lastModifiedDate.AddMinutes(-2).ToString("yyyy-MM-dd HH:mm:ss") + "' and CreateDate < '" + lastModifiedDate.AddMinutes(2).ToString("yyyy-MM-dd HH:mm:ss") + "' and BTMID in ('" + String.Join("','", BTMIDs) + "')  order by CreateDate", conn);
+				SqlCommand cmd = new SqlCommand("select CreateDate, BTMID, Code, Message   from  LogEntries with (nolock)  where CreateDate > '" + game.LastModifiedDate.AddMinutes(-2).ToString("yyyy-MM-dd HH:mm:ss") + "' and CreateDate < '" + game.LastModifiedDate.AddMinutes(2).ToString("yyyy-MM-dd HH:mm:ss") + "' and BTMID in ('" + String.Join("','", BTMIDs) + "')  order by CreateDate", conn);
 				SqlDataReader reader = cmd.ExecuteReader();
 
 				while (reader.Read())
@@ -95,7 +103,9 @@ namespace StuckBetsAnalyzer
 						BTMID = reader["BTMID"].ToString(),
 						Code = (int) reader["Code"],
 						CreateDate = (DateTime)reader["CreateDate"],
-						Message = reader["Message"].ToString()
+						Message = reader["Message"].ToString(),
+						GameProviderSerialNumber = game.GameProviderSerialNumber,
+						ExternalSubProviderCode = game.ExternalSubProviderCode
 					});
 				}
 				reader.Close();
