@@ -1,4 +1,5 @@
-﻿using StuckBetsAnalyzer.StuckedGames;
+﻿using StuckBetsAnalyzer.GameProviders;
+using StuckBetsAnalyzer.StuckedGames;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -20,13 +21,6 @@ namespace StuckBetsAnalyzer
 		public static event GamePorcessingDelegate onGameProcessing; 
 		
 
-
-		public static List<AnalyzeResult> GetAnalyzeResults(List<StuckGame> games)
-		{
-			List<AnalyzeResult> results = new List<AnalyzeResult>();
-
-			return results;
-		}
 
 		public static List<LogEntry> GetLogs(List<StuckGame> games, string externalProviderCode)
 		{
@@ -55,6 +49,64 @@ namespace StuckBetsAnalyzer
 			return logEntries;
 
 		}
+
+
+		public static string GenerateHTMLReport(List<LogEntry> logs, string externalProviderCode)
+		{
+			IGameProvider gameProvider = GameProviderFactory.CreateGameProvider(externalProviderCode);
+			List<AnalyzeResult> analyzeResults = gameProvider.Analize(logs);
+			return GenerateHTML(analyzeResults);
+		}
+
+		private static string GenerateHTML(List<AnalyzeResult> analyzeResults)
+		{
+			string htmlReport = string.Empty;
+			
+			htmlReport = Utils.HTMLHelper.StartHeadAndBody(htmlReport);
+			
+			htmlReport = Utils.HTMLHelper.StartTable(htmlReport);
+			htmlReport = Utils.HTMLHelper.StartRow(htmlReport, "");
+			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "Row");
+			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "Reason");
+			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "Date and time");
+			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "GameProviderSerialNumber");
+			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "ExternalSubProviderCode");
+			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "Log Message");
+			htmlReport = Utils.HTMLHelper.EndRow(htmlReport);
+
+			for (int i = 0; i < analyzeResults.Count; i++)
+			{
+				AnalyzeResult result = analyzeResults[i];
+				LogEntry lastLog = result.logEntries.Last();
+				htmlReport = Utils.HTMLHelper.StartRow(htmlReport, result.Reason.ToString());
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, i.ToString());
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, result.Reason.ToString());
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.CreateDate.ToString("yyyy-MM-dd hh:mm:ss")); 
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.GameProviderSerialNumber);    
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.ExternalSubProviderCode); 
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.Message);  
+				htmlReport = Utils.HTMLHelper.EndRow(htmlReport);
+			}
+
+			htmlReport = Utils.HTMLHelper.EndTable(htmlReport);
+			htmlReport = Utils.HTMLHelper.AddBR(htmlReport);
+
+			Dictionary<string, int> groupedData = analyzeResults.GroupBy(log => log.Reason.ToString()).Select(gr => new { gr.Key, value = gr.Count() }).ToDictionary(a => a.Key, b => b.value);
+
+			htmlReport = Utils.HTMLHelper.StartTable(htmlReport);
+			foreach (KeyValuePair<string, int> item in groupedData)
+			{
+				htmlReport = Utils.HTMLHelper.StartRow(htmlReport, item.Key);
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, item.Key);
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, item.Value.ToString());
+				htmlReport = Utils.HTMLHelper.EndRow(htmlReport);
+			}
+			htmlReport = Utils.HTMLHelper.EndTable(htmlReport);
+
+			htmlReport = Utils.HTMLHelper.EndBody(htmlReport);
+			return htmlReport;
+		}
+
 
 		private static string[] GetGameBTMIDs(StuckGame game, string externalProviderCode)
 		{

@@ -40,6 +40,7 @@
 			this.bottomBar = new System.Windows.Forms.StatusStrip();
 			this.labelProcess = new System.Windows.Forms.ToolStripStatusLabel();
 			this.stripStatus = new System.Windows.Forms.ToolStripStatusLabel();
+			this.buttonReport = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.gridGames)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.gridResult)).BeginInit();
 			this.bottomBar.SuspendLayout();
@@ -100,6 +101,8 @@
 			// 
 			// gridGames
 			// 
+			this.gridGames.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridGames.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			this.gridGames.Location = new System.Drawing.Point(15, 88);
 			this.gridGames.Name = "gridGames";
@@ -108,16 +111,20 @@
 			// 
 			// buttonAnalyse
 			// 
+			this.buttonAnalyse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.buttonAnalyse.Location = new System.Drawing.Point(655, 313);
 			this.buttonAnalyse.Name = "buttonAnalyse";
 			this.buttonAnalyse.Size = new System.Drawing.Size(118, 34);
 			this.buttonAnalyse.TabIndex = 7;
-			this.buttonAnalyse.Text = "Analyze";
+			this.buttonAnalyse.Text = "Get logs";
 			this.buttonAnalyse.UseVisualStyleBackColor = true;
 			this.buttonAnalyse.Click += new System.EventHandler(this.buttonAnalyse_Click);
 			// 
 			// gridResult
 			// 
+			this.gridResult.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridResult.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			this.gridResult.Location = new System.Drawing.Point(15, 353);
 			this.gridResult.Name = "gridResult";
@@ -144,11 +151,23 @@
 			this.stripStatus.Name = "stripStatus";
 			this.stripStatus.Size = new System.Drawing.Size(0, 17);
 			// 
+			// buttonReport
+			// 
+			this.buttonReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonReport.Location = new System.Drawing.Point(513, 313);
+			this.buttonReport.Name = "buttonReport";
+			this.buttonReport.Size = new System.Drawing.Size(118, 34);
+			this.buttonReport.TabIndex = 10;
+			this.buttonReport.Text = "Create report";
+			this.buttonReport.UseVisualStyleBackColor = true;
+			this.buttonReport.Click += new System.EventHandler(this.buttonReport_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(807, 721);
+			this.Controls.Add(this.buttonReport);
 			this.Controls.Add(this.bottomBar);
 			this.Controls.Add(this.gridResult);
 			this.Controls.Add(this.buttonAnalyse);
@@ -160,7 +179,7 @@
 			this.Controls.Add(this.comboGameProviders);
 			this.Controls.Add(this.buttonGetGames);
 			this.Name = "Form1";
-			this.Text = "Form1";
+			this.Text = "Stuck bets analyzer";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
 			this.Load += new System.EventHandler(this.Form1_Load);
 			((System.ComponentModel.ISupportInitialize)(this.gridGames)).EndInit();
@@ -186,6 +205,7 @@
 		private System.Windows.Forms.StatusStrip bottomBar;
 		private System.Windows.Forms.ToolStripStatusLabel labelProcess;
 		private System.Windows.Forms.ToolStripStatusLabel stripStatus;
+		private System.Windows.Forms.Button buttonReport;
 	}
 }
 

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.IO;
 
 namespace StuckBetsAnalyzer
 {
@@ -20,6 +21,7 @@ namespace StuckBetsAnalyzer
 		private Thread workreThread = null;
 		private static bool inProcess = false;
 		private static string currentExternalGameProvider = null;
+		private static List<LogEntry> currentLogEntries = null;
 		public Form1()
 		{
 			InitializeComponent();
@@ -44,7 +46,7 @@ namespace StuckBetsAnalyzer
 			comboGameProviders.SelectedIndexChanged += ComboGameProviders_SelectedIndexChanged;
 		}
 
-		
+
 
 		private void ComboGameProviders_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -69,34 +71,35 @@ namespace StuckBetsAnalyzer
 					workreThread = new Thread(thStart);
 					workreThread.Start();
 					buttonAnalyse.Text = "Stop";
-					
+
 				}
 				else
 				{
 					workreThread.Abort();
-					buttonAnalyse.Text = "Analyze";
+					buttonAnalyse.Text = "Get logs";
 					inProcess = false;
 				}
-				
+
 			}
 		}
 
-		 
+
 
 		private void StartProcessing()
 		{
-			List<LogEntry> logEntries = StuckGamesLogAnalyzer.GetLogs(games, currentExternalGameProvider);
-			Invoke((MethodInvoker)delegate {
+			currentLogEntries = StuckGamesLogAnalyzer.GetLogs(games, currentExternalGameProvider);
+			Invoke((MethodInvoker)delegate
+			{
 				stripStatus.Text = "Finished.";
-				buttonAnalyse.Text = "Analyze";
-				gridResult.DataSource = logEntries;
+				buttonAnalyse.Text = "Get logs";
+				gridResult.DataSource = currentLogEntries;
 			});
-			
+
 			inProcess = false;
 		}
-	
 
-		 
+
+
 
 		private void StuckGamesLogAnalyzer_onGameProcessing(StuckGame game)
 		{
@@ -109,6 +112,15 @@ namespace StuckBetsAnalyzer
 			{
 				MessageBox.Show("Please stop processing");
 				e.Cancel = true;
+			}
+		}
+
+		private void buttonReport_Click(object sender, EventArgs e)
+		{
+			if (currentLogEntries != null)
+			{
+				string strHTML = StuckBetsAnalyzer.StuckGamesLogAnalyzer.GenerateHTMLReport(currentLogEntries, currentExternalGameProvider);
+				System.IO.File.WriteAllText(Path.Combine(Application.StartupPath, "Report_" + datePickerLastModifiedDate.Value.ToString("yyyy-MM_dd") + ".html"), strHTML);
 			}
 		}
 	}
