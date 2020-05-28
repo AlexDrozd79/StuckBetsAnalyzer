@@ -14,5 +14,10 @@ namespace StuckBetsAnalyzer.StuckedGames
 
 		public string ExternalSubProviderCode { get; set; }
 
+		public int PlayerID { get; set; }
+
+		public DateTime PlayerLastLoginDate { get; set; }
+
+		public decimal GameRealDebitAmount { get; set; }
 	}
 }

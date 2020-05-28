@@ -18,8 +18,8 @@ namespace StuckBetsAnalyzer
 
 		public delegate void ProcessingFinishgDelegate(List<LogEntry> logEntries);
 
-		public static event GamePorcessingDelegate onGameProcessing; 
-		
+		public static event GamePorcessingDelegate onGameProcessing;
+
 
 
 		public static List<LogEntry> GetLogs(List<StuckGame> games, string externalProviderCode)
@@ -41,7 +41,7 @@ namespace StuckBetsAnalyzer
 				else
 				{
 					logEntries.Add(new LogEntry() { BTMID = "Not found for game " + game.GameProviderSerialNumber, Message = "Not found" });
-				}	
+				}
 
 				onGameProcessing?.Invoke(game);
 			}
@@ -61,9 +61,9 @@ namespace StuckBetsAnalyzer
 		private static string GenerateHTML(List<AnalyzeResult> analyzeResults)
 		{
 			string htmlReport = string.Empty;
-			
+
 			htmlReport = Utils.HTMLHelper.StartHeadAndBody(htmlReport);
-			
+
 			htmlReport = Utils.HTMLHelper.StartTable(htmlReport);
 			htmlReport = Utils.HTMLHelper.StartRow(htmlReport, "");
 			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "Row");
@@ -71,6 +71,9 @@ namespace StuckBetsAnalyzer
 			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "Date and time");
 			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "GameProviderSerialNumber");
 			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "ExternalSubProviderCode");
+			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "PlayerID");
+			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "GameRealDebitAmount");
+			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "PlayerLastLoginDate");
 			htmlReport = Utils.HTMLHelper.AddCell(htmlReport, "Log Message");
 			htmlReport = Utils.HTMLHelper.EndRow(htmlReport);
 
@@ -81,10 +84,13 @@ namespace StuckBetsAnalyzer
 				htmlReport = Utils.HTMLHelper.StartRow(htmlReport, result.Reason.ToString());
 				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, i.ToString());
 				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, result.Reason.ToString());
-				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.CreateDate.ToString("yyyy-MM-dd HH:mm:ss")); 
-				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.GameProviderSerialNumber);    
-				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.ExternalSubProviderCode); 
-				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.Message);  
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.CreateDate.ToString("yyyy-MM-dd HH:mm:ss"));
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.GameProviderSerialNumber);
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.ExternalSubProviderCode);
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.PlayerID.ToString());
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.GameRealDebitAmount.ToString());
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.PlayerLastLoginDate.ToString("yyyy-MM-dd HH:mm:ss"));
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.Message);
 				htmlReport = Utils.HTMLHelper.EndRow(htmlReport);
 			}
 
@@ -151,13 +157,17 @@ namespace StuckBetsAnalyzer
 
 				while (reader.Read())
 				{
-					logEntries.Add(new LogEntry { 
+					logEntries.Add(new LogEntry
+					{
 						BTMID = reader["BTMID"].ToString(),
-						Code = (int) reader["Code"],
+						Code = (int)reader["Code"],
 						CreateDate = (DateTime)reader["CreateDate"],
 						Message = reader["Message"].ToString(),
 						GameProviderSerialNumber = game.GameProviderSerialNumber,
-						ExternalSubProviderCode = game.ExternalSubProviderCode
+						ExternalSubProviderCode = game.ExternalSubProviderCode,
+						PlayerID = game.PlayerID,
+						PlayerLastLoginDate = game.PlayerLastLoginDate,
+						GameRealDebitAmount = game.GameRealDebitAmount
 					});
 				}
 				reader.Close();

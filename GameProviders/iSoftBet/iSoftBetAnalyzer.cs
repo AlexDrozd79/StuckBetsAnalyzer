@@ -18,13 +18,13 @@ namespace StuckBetsAnalyzer.GameProviders.iSoftBet
 			foreach (string serialNumber in serialNumbers)
 			{
 				List<LogEntry> gameLogs = logEntries.Where(log => log.GameProviderSerialNumber == serialNumber).OrderBy(log => log.CreateDate).ToList();
-				results.Add(AnaluzeGame(gameLogs));
+				results.Add(AnalyzeGame(gameLogs));
 			}
 
 			return results;
 		}
 
-		private AnalyzeResult AnaluzeGame(List<LogEntry> logEntries)
+		private AnalyzeResult AnalyzeGame(List<LogEntry> logEntries)
 		{
 			AnalyzeResult result = new AnalyzeResult();
 			result.Reason = AnalyzeResult.Reasons.Unknown;

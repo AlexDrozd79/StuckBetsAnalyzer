@@ -19,8 +19,9 @@ namespace StuckBetsAnalyzer.StuckedGames
 			using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["Scratch"].ConnectionString))
 			{
 				conn.Open();
-				SqlCommand cmd = new SqlCommand("select LastModifiedDate, GameProviderSerialNumber, ExternalSubProviderCode from PlayersGames inner join Games on PlayersGames.GameID = games.GameID  where games.ExternalProviderCode = '" +
-					externalProviderCode + "'  and year(LastBetRequestDate) = " + lastBetRequestDate.Year + " and month(LastBetRequestDate) = " + lastBetRequestDate.Month +
+				SqlCommand cmd = new SqlCommand("select PlayersGames.LastModifiedDate, GameProviderSerialNumber, ExternalSubProviderCode, PlayersGames.PlayerID, LastLoginDate, GameRealDebitAmount " +
+					"from PlayersGames inner join Games on PlayersGames.GameID = games.GameID left join rptPlayers on PlayersGames.PlayerID = rptPlayers.PlayerID  " +
+					"where games.ExternalProviderCode = '" + externalProviderCode + "'  and year(LastBetRequestDate) = " + lastBetRequestDate.Year + " and month(LastBetRequestDate) = " + lastBetRequestDate.Month +
 					" and day(LastBetRequestDate) = " + lastBetRequestDate.Day + " order by LastBetRequestDate asc", conn);
 				SqlDataReader reader = cmd.ExecuteReader();
 
@@ -30,7 +31,10 @@ namespace StuckBetsAnalyzer.StuckedGames
 					{
 						GameProviderSerialNumber = reader["GameProviderSerialNumber"].ToString(),
 						LastModifiedDate = (DateTime)reader["LastModifiedDate"],
-						ExternalSubProviderCode = reader["ExternalSubProviderCode"].ToString()
+						ExternalSubProviderCode = reader["ExternalSubProviderCode"].ToString(),
+						PlayerID = (int)reader["PlayerID"],
+						PlayerLastLoginDate = (DateTime)reader["LastLoginDate"],
+						GameRealDebitAmount = (decimal)reader["GameRealDebitAmount"]
 					});
 				}
 				reader.Close();

@@ -1,0 +1,7 @@
+﻿Hey, feature suggestion for you AMIZING program for stuck rounds:
+	
+Add Playerid (and if possible in both encrypted and decrypted forms, but at least one).
+	Add last login date (from the players table) - Or at least let me know if you check if the player has logged in since the stuck round.
+	Add debit amount 
+
+Just to clarify. The first point is pretty important (when contacting outside NG). The other points are more like a commodity. 
