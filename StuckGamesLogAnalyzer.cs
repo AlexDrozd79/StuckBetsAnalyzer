@@ -81,7 +81,7 @@ namespace StuckBetsAnalyzer
 				htmlReport = Utils.HTMLHelper.StartRow(htmlReport, result.Reason.ToString());
 				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, i.ToString());
 				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, result.Reason.ToString());
-				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.CreateDate.ToString("yyyy-MM-dd hh:mm:ss")); 
+				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.CreateDate.ToString("yyyy-MM-dd HH:mm:ss")); 
 				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.GameProviderSerialNumber);    
 				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.ExternalSubProviderCode); 
 				htmlReport = Utils.HTMLHelper.AddCell(htmlReport, lastLog.Message);  
